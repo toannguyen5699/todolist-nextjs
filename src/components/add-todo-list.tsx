@@ -2,7 +2,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
 import { Inter } from "next/font/google";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Item } from "@/models/item.model";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,11 +19,15 @@ export default function AddTodoList(props: Props) {
       description: "",
       date: "",
       priority: "",
+      status: false,
     }
   );
 
-  const addTodo = () => {
+  const addTodo = useCallback(() => {
     let todos = localStorage.getItem("todos");
+    if (!todo.title) {
+      return;
+    }
     if (todos) {
       let todosJson = JSON.parse(todos);
       if (
@@ -37,27 +41,36 @@ export default function AddTodoList(props: Props) {
         todosJson.push(todo);
         localStorage.setItem("todos", JSON.stringify(todosJson));
         alert("Todo has been added");
-        setTodo({ title: "", description: "", date: "", priority: "" });
+        setTodo({
+          title: "",
+          description: "",
+          date: "",
+          priority: "",
+          status: false,
+        });
       }
     } else {
       localStorage.setItem("todos", JSON.stringify([todo]));
     }
     window.dispatchEvent(new Event("storage"));
-  };
+  }, [todo]);
 
-  const editTodo = () => {
+  const editTodo = useCallback(() => {
     let todos = localStorage.getItem("todos") as string;
     let todosJson = JSON.parse(todos);
-    const tempTpdos = todosJson.filter((value: any) => {
+    if (!todo.title) {
+      return;
+    }
+    const tempTodos = todosJson.filter((value: any) => {
       return value.title !== item?.title;
     });
     setTimeout(() => {
-      tempTpdos.push(todo);
-      localStorage.setItem("todos", JSON.stringify(tempTpdos));
+      tempTodos.push(todo);
+      localStorage.setItem("todos", JSON.stringify(tempTodos));
       alert("Todo has been edited");
       window.dispatchEvent(new Event("storage"));
     });
-  };
+  }, [item?.title, todo]);
 
   const onChange = (e: any) => {
     setTodo({ ...todo, [e.target.name]: e.target.value });
@@ -133,7 +146,7 @@ export default function AddTodoList(props: Props) {
               onClick={item ? editTodo : addTodo}
               className="text-white bg-green-500 border-0 py-2 px-8 focus:outline-none w-fit hover:bg-green-600 rounded text-lg w-full"
             >
-              {!item ? "Add" : "Edit"}
+              {!item ? "Add" : "Update"}
             </button>
           </div>
         </div>

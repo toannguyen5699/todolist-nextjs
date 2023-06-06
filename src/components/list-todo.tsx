@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Item } from "@/models/item.model";
 import ItemComp from "./item";
 
@@ -19,31 +19,45 @@ export default function ListTodo() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  const handleDone = () => {
+  const handleDone = useCallback(() => {
     alert(`List checked: ${listCheckboxChecked}`);
-  };
-
-  const deleteTodo = (title: string) => {
-    let newTodos = todos.filter((item) => {
-      return item.title != title;
+    const result = todos.map((item) => {
+      if (listCheckboxChecked.includes(item.title)) {
+        item.status = true;
+      }
+      return item;
     });
-    localStorage.setItem("todos", JSON.stringify(newTodos));
+    localStorage.setItem("todos", JSON.stringify(result));
     window.dispatchEvent(new Event("storage"));
-  };
+  }, [listCheckboxChecked, todos]);
 
-  const handleCheckBox = (title: string, checked: boolean) => {
-    let listArray = [] as Array<string>;
-    if (checked) {
-      listArray = [...listCheckboxChecked, title];
-      setListCheckboxChecked(listArray);
-    }
-    if (!checked) {
-      const tempList = listCheckboxChecked.filter((e: string) => {
-        return e !== title;
+  const deleteTodo = useCallback(
+    (title: string) => {
+      let newTodos = todos.filter((item) => {
+        return item.title != title;
       });
-      setListCheckboxChecked(tempList);
-    }
-  };
+      localStorage.setItem("todos", JSON.stringify(newTodos));
+      window.dispatchEvent(new Event("storage"));
+    },
+    [todos]
+  );
+
+  const handleCheckBox = useCallback(
+    (title: string, checked: boolean) => {
+      let listArray = [] as Array<string>;
+      if (checked) {
+        listArray = [...listCheckboxChecked, title];
+        setListCheckboxChecked(listArray);
+      }
+      if (!checked) {
+        const tempList = listCheckboxChecked.filter((e: string) => {
+          return e !== title;
+        });
+        setListCheckboxChecked(tempList);
+      }
+    },
+    [listCheckboxChecked]
+  );
 
   const deleteMultipleItem = () => {
     const result = todos.filter(
@@ -52,10 +66,6 @@ export default function ListTodo() {
     localStorage.setItem("todos", JSON.stringify(result));
     window.dispatchEvent(new Event("storage"));
   };
-
-  // const onChange = (e: any) => {
-  //   console.log(e.target.value);
-  // };
 
   const onChange = (e: any) => {
     const keyword = e.target.value;
@@ -69,7 +79,6 @@ export default function ListTodo() {
     } else {
       setFoundItem(todos);
     }
-
     setKeySearch(keyword);
   };
 
