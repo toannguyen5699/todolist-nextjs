@@ -112,20 +112,16 @@ export default function ListTodo() {
                     />
                   );
                 })
-              : todos
-                  // .filter((e) => {
-                  //   e.title === keySearch;
-                  // })
-                  .map((item) => {
-                    return (
-                      <ItemComp
-                        key={item.title}
-                        item={item}
-                        handleDelete={deleteTodo}
-                        handleCheckBox={handleCheckBox}
-                      />
-                    );
-                  })}
+              : todos?.map((item) => {
+                  return (
+                    <ItemComp
+                      key={item.title}
+                      item={item}
+                      handleDelete={deleteTodo}
+                      handleCheckBox={handleCheckBox}
+                    />
+                  );
+                })}
           </div>
         </div>
 
