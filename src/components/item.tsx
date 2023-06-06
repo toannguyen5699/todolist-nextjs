@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Item } from "@/models/item.model";
 import AddTodoList from "./add-todo-list";
+import cx from "classnames";
 
 interface Props {
   item: Item;
@@ -24,7 +25,12 @@ export default function ItemComp(props: Props) {
   };
 
   return (
-    <div key={item.title} className="p-4 w-full border-2 mb-1">
+    <div
+      key={item.title}
+      className={cx("p-4 w-full border-2 mb-1", {
+        ["bg-gray-500"]: item.status,
+      })}
+    >
       <div className="h-full flex flex-col ">
         <div className="h-full flex flex-row ">
           <div className="flex flex-row w-full">

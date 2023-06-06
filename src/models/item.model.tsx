@@ -3,4 +3,5 @@ export interface Item {
   description: string;
   date: string;
   priority: string;
+  status: boolean;
 }
